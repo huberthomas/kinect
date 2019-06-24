@@ -13,6 +13,8 @@ If all is working just execute the compiled kinect application.
 
 ### Hints:
 
+Tested successfully with Ubuntu 16.04 LTS.
+
 Flags for debug or release build:
 
 cmake -DCMAKE_BUILD_TYPE=Debug
