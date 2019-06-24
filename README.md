@@ -11,6 +11,21 @@ Connect the Kinect V1 and test with the following command
 
 If all is working just execute the compiled kinect application.
 
+## Execution
+
+    [-h] Help information. 
+    [-o outDir] Output file directory. Default is 'results' in the application directory. 
+
+    During execution the following key events are activated: 
+
+    ESC Close application. 
+    SPACE Save a single frame 
+    d Switch depth modes. 
+    s Start/stop frame saving. 
+    a En-/disable auto exposure. 
+    w En-/disable white balance. 
+    r En-/disable raw color. 
+
 ### Hints:
 
 Tested successfully with Ubuntu 16.04 LTS.
