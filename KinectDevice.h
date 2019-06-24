@@ -2,9 +2,11 @@
 #ifndef KINECT_DEVICE_H
 #define KINECT_DEVICE_H
 
+#include <mutex>
+#include <chrono>
+
 #include "libfreenect.hpp"
 #include "opencv2/core/core.hpp"
-#include <QMutex>
 
 class KinectDevice : public Freenect::FreenectDevice {
 public:
@@ -12,21 +14,20 @@ public:
 
     void VideoCallback(void* rgb, uint32_t timestamp) override;
     void DepthCallback(void* depth, uint32_t timestamp) override;
-    bool getVideo(cv::Mat& output, uint32_t& timestamp);
-    bool getDepth(cv::Mat& output, uint32_t& timestamp);
+    void getVideo(cv::Mat& output, int64_t &timestamp) noexcept;
+    void getDepth(cv::Mat& output, int64_t& timestamp) noexcept;
 
 private:
-    std::vector<uint8_t> _bufferDepth;
-    std::vector<uint8_t> _bufferRgb;
-    std::vector<uint16_t> _gamma;
-    cv::Mat _depthMat;
-    cv::Mat _rgbMat;
-    QMutex _rgbMutex;
-    QMutex _depthMutex;
-    uint32_t _rgbTimestamp;
-    uint32_t _depthTimestamp;
-    bool _getNewRgbFrame;
-    bool _getNewDepthFrame;
+    std::vector<uint8_t> _bufferDepth{FREENECT_DEPTH_11BIT};
+    std::vector<uint8_t> _bufferRgb{FREENECT_VIDEO_RGB};
+    cv::Mat _depthMat{cv::Mat(cv::Size(640,480), CV_16UC1)};
+    cv::Mat _rgbMat{cv::Mat(cv::Size(640,480), CV_8UC3, cv::Scalar(0))};
+    std::mutex _rgbMutex;
+    std::mutex _depthMutex;
+    int64_t _rgbTimestamp;
+    int64_t _depthTimestamp;
+    bool _getNewRgbFrame{false};
+    bool _getNewDepthFrame{false};
 };
 
 #endif // KINECT_DEVICE_H
