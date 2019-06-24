@@ -17,8 +17,8 @@ Tested successfully with Ubuntu 16.04 LTS.
 
 Flags for debug or release build:
 
-  cmake -DCMAKE_BUILD_TYPE=Debug
-  cmake -DCMAKE_BUILD_TYPE=Release
+    cmake -DCMAKE_BUILD_TYPE=Debug
+    cmake -DCMAKE_BUILD_TYPE=Release
 
 ## Acknowledgement:
 
