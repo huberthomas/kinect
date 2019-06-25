@@ -70,10 +70,6 @@ void KinectHandler::startCapturing() {
         _device->getVideo(rgbMat, rgbTimestamp);
         _device->getDepth(depthMat, depthTimestamp);
 
-        float z = depthMat.at<uint16_t>(240, 320);
-
-        cout << z << endl;
-
         displayResults(rgbMat, depthMat);
 
         char k = cvWaitKey(5);
