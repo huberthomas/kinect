@@ -81,21 +81,21 @@ void KinectHandler::startCapturing() {
         }
         if(k == 97) {
             // a
-            cout << "FREENECT_AUTO_EXPOSURE: " << _enableAutoExposure << endl;
             _enableAutoExposure = !_enableAutoExposure;
             enableAutoExposure(_enableAutoExposure);
+            cout << "FREENECT_AUTO_EXPOSURE: " << (_enableAutoExposure ? "on" : "off") << endl;
         }
         if(k == 119) {
             // w
-            cout << "FREENECT_AUTO_WHITE_BALANCE: " << _enableWhiteBalance << endl;
             _enableWhiteBalance = !_enableWhiteBalance;
             enableWhiteBalance(_enableWhiteBalance);
+            cout << "FREENECT_AUTO_WHITE_BALANCE: " << (_enableWhiteBalance ? "on" : "off") << endl;
         }
         if(k == 114) {
             // r
-            cout << "FREENECT_RAW_COLOR: " << _enableRawColor << endl;
             _enableRawColor = !_enableRawColor;
             enableRawColor(_enableRawColor);
+            cout << "FREENECT_RAW_COLOR: " << (_enableRawColor ? "on" : "off") << endl;
         }
         if(k == 115) {
             // s
@@ -387,27 +387,27 @@ void KinectHandler::setDepthMode(const short &depthMode)
     switch(depthMode) {
     case 0:
         _device->setDepthFormat(FREENECT_DEPTH_11BIT);
-        cout << "FREENECT_DEPTH_11BIT" << endl;
+        cout << "depth format: FREENECT_DEPTH_11BIT" << endl;
         break;
     case 1:
         _device->setDepthFormat(FREENECT_DEPTH_10BIT);
-        cout << "FREENECT_DEPTH_10BIT" << endl;
+        cout << "depth format: FREENECT_DEPTH_10BIT" << endl;
         break;
     case 2:
         _device->setDepthFormat(FREENECT_DEPTH_11BIT_PACKED);
-        cout << "FREENECT_DEPTH_11BIT_PACKED" << endl;
+        cout << "depth format: FREENECT_DEPTH_11BIT_PACKED" << endl;
         break;
     case 3:
         _device->setDepthFormat(FREENECT_DEPTH_10BIT_PACKED);
-        cout << "FREENECT_DEPTH_10BIT_PACKED" << endl;
+        cout << "depth format: FREENECT_DEPTH_10BIT_PACKED" << endl;
         break;
     case 4:
         _device->setDepthFormat(FREENECT_DEPTH_REGISTERED);
-        cout << "FREENECT_DEPTH_REGISTERED" << endl;
+        cout << "depth format: FREENECT_DEPTH_REGISTERED" << endl;
         break;
     case 5:
         _device->setDepthFormat(FREENECT_DEPTH_MM);
-        cout << "FREENECT_DEPTH_MM" << endl;
+        cout << "depth format: FREENECT_DEPTH_MM" << endl;
         break;
     }
     usleep(freenectSetupTimeMs * 1000);
