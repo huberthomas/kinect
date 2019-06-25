@@ -1,5 +1,21 @@
 # kinect
 
+This is a small appication to capture RGB and depth data from the XBOX360 Kinect device. 
+It supports some controls over the device. For this see the execution subsection. The stream
+can be saved on your hard disk, the default directory structure is
+
+    kinect
+    - results
+    | - capturing_start_timestamp
+    | | - rgb
+    | | | capturing_timestamp_in_ms_from_time_epoch.png
+    | | - depth
+    | | | capturing_timestamp_in_ms_from_time_epoch.png
+    | | | rgb_depth.txt
+
+The 'rgb_depth.txt' file contains a list of associated RGB and depth image files. They are linked
+by the shortest timestamp difference, files over 200ms difference are skipped.
+
 ## Installation
 
     sudo apt install freenect libusb-1.0-0 
@@ -13,6 +29,7 @@ If all is working just execute the compiled kinect application.
 
 ## Execution
 
+    > ./kinect
     [-h] Help information. 
     [-o outDir] Output file directory. Default is 'results' in the application directory. 
 
