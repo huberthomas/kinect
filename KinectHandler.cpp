@@ -100,6 +100,7 @@ void KinectHandler::startCapturing() {
         if(k == 115) {
             // s
             save = !save;
+            cout << (save ? "start saving stream" : "stop saving stream") << endl;
         }
         if(k == 100) {
             // d
