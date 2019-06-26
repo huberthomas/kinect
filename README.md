@@ -31,7 +31,8 @@ If all is working just execute the compiled kinect application.
 
     > ./kinect
     [-h] Help information. 
-    [-o outDir] Output file directory. Default is 'results' in the application directory. 
+    [-o outDir] Output file directory. Default is 'results' in the application directory.
+    [-s] Synchronize RGB with depth files and store results to file. Needs -o outDir.
 
     During execution the following key events are activated: 
 

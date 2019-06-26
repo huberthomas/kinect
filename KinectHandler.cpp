@@ -1,13 +1,11 @@
 #include "KinectHandler.h"
 #include <iostream>
 #include <fstream>
-#include <chrono>
-#include <unistd.h>
-#include <stdlib.h>
+#include <iomanip>
+#include <ctime>
+#include <sstream>
 
-#include <QDateTime>
 #include <QDir>
-#include <QStringList>
 
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/core/core.hpp"
@@ -15,9 +13,8 @@
 
 using namespace std;
 
-#define cvWindowTitleRgb "rgb"
-#define cvWindowTitleDepth "depth"
-#define freenectSetupTimeMs 500
+#define cvWindowTitleRgb "RGB"
+#define cvWindowTitleDepth "Depth"
 
 /**
  * @brief Start capturing image and depth frames from the Kinect device.
@@ -25,8 +22,10 @@ using namespace std;
 void KinectHandler::startCapturing() {
     _isRunning = true;
 
-    const string subOutputDir = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh:mm:ss").toStdString();
-    const string separator = QString(QDir::separator()).toStdString();
+    const string separator = "/";
+    string resDir{""};
+    string rgbDir{""};
+    string depthDir{""};
 
     int64_t rgbTimestamp{0};
     int64_t depthTimestamp{0};
@@ -50,21 +49,10 @@ void KinectHandler::startCapturing() {
     _device->startDepth();
 
     bool save = false;
+    bool resultDirectoriesCreated = false;
 
     cv::namedWindow(cvWindowTitleRgb, CV_WINDOW_AUTOSIZE);
     cv::namedWindow(cvWindowTitleDepth, CV_WINDOW_AUTOSIZE);
-
-    string resDir = "results" + separator + subOutputDir + separator;
-    string rgbDir = resDir + "rgb" + separator;
-    string depthDir = resDir + "depth" + separator;
-
-    bool resultDirectoriesCreated = false;
-
-    if(_outputDir.size() > 0 ) {
-        resDir = _outputDir;
-        rgbDir = resDir + "rgb" + separator;
-        depthDir = resDir + "depth" + separator;
-    }
 
     while(_isRunning) {
         _device->getVideo(rgbMat, rgbTimestamp);
@@ -82,24 +70,35 @@ void KinectHandler::startCapturing() {
         if(k == 97) {
             // a
             _enableAutoExposure = !_enableAutoExposure;
-            enableAutoExposure(_enableAutoExposure);
+            _device->setFlag(FREENECT_AUTO_EXPOSURE, _enableAutoExposure);
+
             cout << "FREENECT_AUTO_EXPOSURE: " << (_enableAutoExposure ? "on" : "off") << endl;
         }
         if(k == 119) {
             // w
             _enableWhiteBalance = !_enableWhiteBalance;
-            enableWhiteBalance(_enableWhiteBalance);
+            _device->setFlag(FREENECT_AUTO_WHITE_BALANCE, _enableWhiteBalance);
+
             cout << "FREENECT_AUTO_WHITE_BALANCE: " << (_enableWhiteBalance ? "on" : "off") << endl;
         }
         if(k == 114) {
             // r
             _enableRawColor = !_enableRawColor;
-            enableRawColor(_enableRawColor);
+            _device->setFlag(FREENECT_RAW_COLOR, _enableRawColor);
+
             cout << "FREENECT_RAW_COLOR: " << (_enableRawColor ? "on" : "off") << endl;
         }
         if(k == 115) {
             // s
             save = !save;
+
+            if(save) {
+                resultDirectoriesCreated = false;
+            }
+            if(rgbDir.size() > 0 && depthDir.size() > 0 && resDir.size() > 0){
+                associateFiles(rgbDir, depthDir, resDir);
+            }
+
             cout << (save ? "start saving stream" : "stop saving stream") << endl;
         }
         if(k == 100) {
@@ -115,6 +114,12 @@ void KinectHandler::startCapturing() {
         if(k == 32 || save) {
             // space
             if(!resultDirectoriesCreated) {
+                string subOutputDir = getCurrentDateTime();
+
+                resDir = _outputDir + "results" + separator + subOutputDir + separator;
+                rgbDir = resDir + "rgb" + separator;
+                depthDir = resDir + "depth" + separator;
+
                 createDirectory(rgbDir);
                 createDirectory(depthDir);
 
@@ -135,8 +140,6 @@ void KinectHandler::startCapturing() {
     }
 
     stopCapturing();
-
-    associateFiles(rgbDir, depthDir, resDir);
 }
 
 /**
@@ -169,7 +172,7 @@ void KinectHandler::setOutputDir(const string &outputDir) {
 
     _outputDir = outputDir;
 
-    const string separator = QString(QDir::separator()).toStdString();
+    const string separator = "/";
 
     if(_outputDir.rfind(separator) != _outputDir.size()) {
         _outputDir += separator;
@@ -228,52 +231,6 @@ void KinectHandler::associateFiles(const string &rgbDir, const string &depthDir,
 }
 
 /**
- * @brief En-/disable auto exposure. Consumes a short break to activate that mode.
- * @param enable True enable, otherwise disable.
- */
-void KinectHandler::enableAutoExposure(const bool &enable) noexcept
-{
-    _enableAutoExposure = enable;
-    if(!_device) {
-        return;
-    }
-
-    _device->setFlag(FREENECT_AUTO_EXPOSURE, enable ? FREENECT_ON : FREENECT_OFF);
-    usleep(freenectSetupTimeMs * 1000);
-}
-
-/**
- * @brief En-/disable white balance mode. Consumes a short break to activate that mode.
- * @param enable True enable, otherwise disable.
- */
-void KinectHandler::enableWhiteBalance(const bool &enable) noexcept
-{
-    _enableWhiteBalance = enable;
-    if(!_device) {
-        return;
-    }
-
-    _device->setFlag(FREENECT_AUTO_WHITE_BALANCE, enable ? FREENECT_ON : FREENECT_OFF);
-    usleep(freenectSetupTimeMs * 1000);
-}
-
-/**
- * @brief En-/disable raw color mode. Consumes a short break to activate that mode.
- * @param enable True enable, otherwise disable.
- */
-void KinectHandler::enableRawColor(const bool &enable) noexcept
-{
-    _enableRawColor = enable;
-
-    if(!_device) {
-        return;
-    }
-
-    _device->setFlag(FREENECT_RAW_COLOR, enable ? FREENECT_ON : FREENECT_OFF);
-    usleep(freenectSetupTimeMs * 1000);
-}
-
-/**
  * @brief Display results in an OpenCV output window.
  * @param rgb Captured RGB image.
  * @param depth Captured depth image.
@@ -319,10 +276,8 @@ bool KinectHandler::checkDir(string &dir) noexcept
         return false;
     }
 
-    const string separator = QString(QDir::separator()).toStdString();
-
-    if(dir.rfind(separator) != dir.size()) {
-        dir += separator;
+    if(dir.rfind("/") != dir.size()) {
+        dir += "/";
     }
 
     return true;
@@ -411,5 +366,18 @@ void KinectHandler::setDepthMode(const short &depthMode)
         cout << "depth format: FREENECT_DEPTH_MM" << endl;
         break;
     }
-    usleep(freenectSetupTimeMs * 1000);
+}
+
+/**
+ * @brief KinectHandler::getDate
+ * @return Curent date time, e.g. 2019-06-26_16:03:02
+ */
+string KinectHandler::getCurrentDateTime() noexcept
+{
+    auto t = std::time(nullptr);
+    auto tm = *std::localtime(&t);
+
+    std::ostringstream oss;
+    oss << std::put_time(&tm, "%Y-%m-%d_%H-%M-%S");
+    return oss.str();
 }

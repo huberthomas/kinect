@@ -20,10 +20,6 @@ public:
                         const std::string &resultDir,
                         const int &maxDifferenceMs = 200);
 
-    void enableAutoExposure(const bool &enable) noexcept;
-    void enableWhiteBalance(const bool &enable) noexcept;
-    void enableRawColor(const bool &enable) noexcept;
-
 private:
     std::string _prefix{""};
     std::string _suffix{"png"};
@@ -43,6 +39,7 @@ private:
     std::vector<std::string> getFiles(const std::string &dir, const std::string &filter) noexcept;
     void init();
     void setDepthMode(const short &depthMode);
+    std::string getCurrentDateTime() noexcept;
 };
 
 #endif
