@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
                 string depthDir = outputDir + "/depth/";
                 handler.associateFiles(rgbDir, depthDir, outputDir);
 
-                out << "Synchronization successfull finished." << endl;
+                cout << "Synchronization successfull finished." << endl;
                 return 0;
             } else {
                 throw runtime_error("-s needs an output directory.");
