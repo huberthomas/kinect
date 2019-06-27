@@ -4,6 +4,8 @@
 #include <iomanip>
 #include <ctime>
 #include <sstream>
+#include <map>
+#include <stdio.h>
 
 #include <QDir>
 
@@ -126,13 +128,13 @@ void KinectHandler::startCapturing() {
                 resultDirectoriesCreated = true;
             }
 
-            cout << "saving rgb: " << _prefix << rgbTimestamp << "." << _suffix;
-            cout << " depth: " << _prefix << depthTimestamp << "." << _suffix << endl;
+            cout << "saving rgb: " << _prefix << rgbTimestamp << _suffix << "." << _extension;
+            cout << " depth: " << _prefix << depthTimestamp << _suffix << "." << _extension << endl;
 
             ostringstream rgbFile;
             ostringstream depthFile;
-            rgbFile << rgbDir << _prefix << rgbTimestamp << "." << _suffix;
-            depthFile << depthDir << _prefix << depthTimestamp << "." << _suffix;
+            rgbFile << rgbDir << _prefix << rgbTimestamp << _suffix << "." << _extension;
+            depthFile << depthDir << _prefix << depthTimestamp << _suffix << "." << _extension;
 
             cv::imwrite(rgbFile.str(), rgbMat);
             cv::imwrite(depthFile.str(), depthMat);
@@ -187,7 +189,7 @@ void KinectHandler::setOutputDir(const string &outputDir) {
  * @param resultDir Base result directory to store the file associations.
  * @param maxDifferenceMs Maximum difference between timestamps, otherwise skip.
  */
-void KinectHandler::associateFiles(const string &rgbDir, const string &depthDir, const string &resultDir, const int &maxDifferenceMs)
+void KinectHandler::associateFiles(const string &rgbDir, const string &depthDir, const string &resultDir, const bool &cleanUp, const int &maxDifferenceMs)
 {
     string resDir = resultDir;
 
@@ -195,8 +197,11 @@ void KinectHandler::associateFiles(const string &rgbDir, const string &depthDir,
         throw runtime_error("Result direcory error: " + resultDir);
     }
 
-    vector<string> rgbFiles = getFiles(rgbDir, "*." + _suffix);
-    vector<string> depthFiles = getFiles(depthDir, "*." + _suffix);
+    vector<string> rgbFiles = getFiles(rgbDir, "*." + _extension);
+    vector<string> depthFiles = getFiles(depthDir, "*." + _extension);
+
+    map<int, string> usedDepthFiles;
+
 
     ofstream resFile;
     resFile.open(resDir + _outputFile);
@@ -224,10 +229,22 @@ void KinectHandler::associateFiles(const string &rgbDir, const string &depthDir,
 
         if(foundCandidateIndex != -1) {
             resFile << rgbFiles[i] << " " << depthFiles[foundCandidateIndex] << "\n";
+
+            usedDepthFiles[foundCandidateIndex] = depthFiles[foundCandidateIndex];
         }
     }
-
     resFile.close();
+
+    if(cleanUp) {
+        cout << "Cleaning up." << endl;
+        for(int i = 0, iLength = depthFiles.size(); i < iLength; i++) {
+            if(usedDepthFiles.find(i) == usedDepthFiles.end()) {
+                if(remove((depthDir + "/" + depthFiles[i]).c_str()) == 0) {
+                    cout << depthFiles[i] << endl;
+                }
+            }
+        }
+    }
 }
 
 /**

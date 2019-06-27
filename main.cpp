@@ -14,7 +14,7 @@ void help()
     out << endl;
     out << "[-h] Help information." << endl;
     out << "[-o outDir] Output file directory. Default is 'results' in the application directory." << endl;
-    out << "[-s] Synchronize RGB with depth files and store results to file. Needs -o outDir.";
+    out << "[-s] Synchronize RGB with depth files and store results to file. Needs -o outDir. Removes unlinked depth files.";
     out << endl;
     out << "During execution the following key events are activated:" << endl;
     out << endl;
@@ -76,8 +76,8 @@ int main(int argc, char **argv) {
             if(outputDir.size() > 0){
                 string rgbDir = outputDir + "/rgb/";
                 string depthDir = outputDir + "/depth/";
+                cout << "Start synchronization of '" << outputDir << "'." << endl;
                 handler.associateFiles(rgbDir, depthDir, outputDir);
-
                 cout << "Synchronization successfull finished." << endl;
                 return 0;
             } else {

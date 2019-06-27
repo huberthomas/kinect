@@ -18,11 +18,13 @@ public:
     void associateFiles(const std::string &rgbDir,
                         const std::__cxx11::string &depthDir,
                         const std::string &resultDir,
+                        const bool &cleanUp = true,
                         const int &maxDifferenceMs = 200);
 
 private:
     std::string _prefix{""};
-    std::string _suffix{"png"};
+    std::string _suffix{""};
+    std::string _extension{"png"};
     std::string _outputDir{""};
     std::string _outputFile{"rgb_depth.txt"};
 
